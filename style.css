@@ -29,6 +29,7 @@ main{
 	font-family: Retroica;
 	font-size:2rem;
 	height: 100%;
+	display: none;
 }
 .navbar-items img {
 	width: 2.5em;
