@@ -5,12 +5,15 @@
 	margin: 0px;
 	padding: 0px;
 	text-decoration: none;
+	overflow:hidden;
 }
 body {
 	font-size: 1em;
-	background-color: #171717;
-	width: 100vw;
+	background-image: url(
+		"./bk.svg"
+	);
 	height: 100vh;
+	width : 100vw;
 }
 main{
 	width: 100%;
@@ -19,9 +22,9 @@ main{
 .navbar-items{
 	display: flex;
 	padding : 10px 1rem 0px 1rem;
-  flex-direction: row;
+	flex-direction: row;
 	align-items: center;
-  justify-content: space-around;
+	justify-content: space-around;
 	text-align: center;
 	font-family: Retroica;
 	font-size:2rem;
@@ -44,11 +47,11 @@ main{
 
 button{
 	border-radius: 20em;
-  color: black;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
+	color: black;
+	padding: 15px 32px;	
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
 }
 .donate-button button{
 	background-color: transparent;
@@ -69,6 +72,7 @@ button{
 	font-size: 2em;
 	text-align: center;
 	padding: 100px;
+	font-family: Retroica;
 }
 
 .container-text .container-buttons {
