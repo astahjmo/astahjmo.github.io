@@ -1,7 +1,6 @@
 +++
 title = 'About'
 date = 2023-11-25T23:32:26-03:00
-draft = true
 +++
 
 Hello, I'm astah (or astaroth).
