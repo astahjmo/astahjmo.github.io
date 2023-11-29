@@ -38,7 +38,7 @@ url = "https://github.com/Astahjmo"
   [[menu.main]]
     identifier = "journalctl"
     name = "Journal"
-    url = "/posts/"
+    url = "/journal/"
     weight = 10
 
 [taxonomies]
@@ -48,10 +48,7 @@ series = "series"
 
 [markup.goldmark.renderer]
 unsafe = true
+smartypants = true
 
 [markup]
-
-  [markup.tableOfContents]
-    startLevel = 2
-    endLevel   = 3
-    ordered    = true
+  defaultMarkdownHandler = "goldmark"

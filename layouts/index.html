@@ -1,4 +1,15 @@
 {{ define "main" }}
-    {{ .Content }}
+  <h1>{{ .Title }}</h1>
+  <ul>
+    {{ range .Site.RegularPages.ByDate.Reverse }}
+      {{ if eq .Section "journal" }}
+        <li>
+			<a href="{{ .Permalink }}"><strong>{{ .Title }}</strong> </a> - #{{ .Date.Format "2 jan 2006" }}
+        </li>
+      {{ end }}
+    {{ end }}
+  </ul>
 {{ end }}
 
+{{define "aside" }}
+{{ end }}

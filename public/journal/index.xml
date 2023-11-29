@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Journals on Astaroth</title>
+    <link>https://risotto.joeroe.io/journal/</link>
+    <description>Recent content in Journals on Astaroth</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>© [Joe Roe](https://joeroe.io) &amp; [risotto contributors](https://github.com/joeroe/risotto/graphs/contributors).</copyright>
+    <lastBuildDate>Wed, 29 Nov 2023 19:33:21 -0300</lastBuildDate>
+    <atom:link href="https://risotto.joeroe.io/journal/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>First</title>
+      <link>https://risotto.joeroe.io/journal/first/</link>
+      <pubDate>Wed, 29 Nov 2023 19:33:21 -0300</pubDate>
+      <guid>https://risotto.joeroe.io/journal/first/</guid>
+      <description></description>
+    </item>
+  </channel>
+</rss>
