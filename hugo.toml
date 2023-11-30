@@ -20,7 +20,7 @@ palette = "tokyo-night-dark"
 [params.about]
 title = "Astaroth"
 description = "I think, therefore, I get brain smash"
-logo = "images/rice.svg"
+logo = "images/me.jpg"
 
 [[params.socialLinks]]
 icon = "fa-brands fa-github"

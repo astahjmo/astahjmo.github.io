@@ -1,7 +1,6 @@
 +++
 title = 'Latex'
 date = 2023-11-29T20:01:27-03:00
-draft = true
 description = 'teste'
 +++
 
