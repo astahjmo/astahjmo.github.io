@@ -1,7 +1,7 @@
-baseURL = "https://risotto.joeroe.io"
+baseURL = "localhost"
 theme = "risotto"
 title = "Astaroth"
-author = "Joe Roe"
+author = "Astaroth"
 copyright = "© [Joe Roe](https://joeroe.io) & [risotto contributors](https://github.com/joeroe/risotto/graphs/contributors)."
 paginate = 3
 languageCode = "en"
@@ -39,6 +39,12 @@ url = "https://github.com/Astahjmo"
     identifier = "journalctl"
     name = "Journal"
     url = "/journal/"
+    weight = 10
+
+  [[menu.main]]
+    identifier = "resume"
+    name = "resume"
+    url = "/resume/"
     weight = 10
 
 [taxonomies]

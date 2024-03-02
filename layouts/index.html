@@ -1,15 +1,16 @@
 {{ define "main" }}
-  <h1>{{ .Title }}</h1>
-  <ul>
-    {{ range .Site.RegularPages.ByDate.Reverse }}
-      {{ if eq .Section "journal" }}
-        <li>
-			<a href="{{ .Permalink }}"><strong>{{ .Title }}</strong> </a> - #{{ .Date.Format "2 jan 2006" }}
-        </li>
-      {{ end }}
-    {{ end }}
-  </ul>
-{{ end }}
+    <header class="content__header">
+        <h1>{{ .Title | markdownify }}</h1>
+        {{ .Content }}
+    </header>
 
-{{define "aside" }}
+	{{ with .Site.GetPage "/journal/" }}
+		{{ range .Pages.ByLastmod.Reverse }}
+			<article class="post">
+				<header class="post__header">
+					<h1><a href="{{ .Permalink }}"><strong>{{ .Title }}</strong></a> - #{{ .Date.Format "2 Jan 2006" }}</h1>
+				</header>
+			</article>
+		{{ end }}
+    {{ end }}
 {{ end }}
