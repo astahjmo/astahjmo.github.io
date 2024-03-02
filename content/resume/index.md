@@ -3,7 +3,7 @@ title = 'My Resume'
 date = 2024-03-02T14:58:06-03:00
 description = ''
 +++
-- Email: contato@johnatan.dev
+- Email: contato@astaroth.dev
 - Github: github.com/astahjmo
 
 ## Perfil
