@@ -1,7 +1,6 @@
 +++
 title = 'My Resume'
 date = 2024-03-02T14:58:06-03:00
-draft = true
 description = ''
 +++
 - Email: contato@johnatan.dev
