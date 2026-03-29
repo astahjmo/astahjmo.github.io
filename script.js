@@ -1141,7 +1141,7 @@ const postSystem = {
   // Setup: 1) Enable Discussions on your repo
   //        2) Install giscus app: https://github.com/apps/giscus
   //        3) Get repo-id and category-id from https://giscus.app
-  GISCUS_REPO: 'astahjmo/personal-blog',
+  GISCUS_REPO: 'astahjmo/astahjmo.github.io',
   GISCUS_REPO_ID: 'R_kgDOR0Dc_g',
   GISCUS_CATEGORY: 'Announcements',
   GISCUS_CATEGORY_ID: 'DIC_kwDOR0Dc_s4C5jta'
