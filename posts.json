@@ -1,0 +1,44 @@
+[
+  {
+    "id": "why-tui",
+    "title": "Por que TUI > GUI",
+    "date": "2026-03-29",
+    "tags": ["opinion", "tui", "linux"],
+    "file": "posts/why-tui.md"
+  },
+  {
+    "id": "neovim-config",
+    "title": "Neovim config from scratch",
+    "date": "2026-03-27",
+    "tags": ["neovim", "dotfiles", "tutorial"],
+    "file": "posts/neovim-config.md"
+  },
+  {
+    "id": "math-beauty",
+    "title": "A beleza da matematica",
+    "date": "2026-03-25",
+    "tags": ["math", "latex"],
+    "file": "posts/math-beauty.md"
+  },
+  {
+    "id": "arch-install",
+    "title": "Instalando Arch Linux do zero",
+    "date": "2026-03-22",
+    "tags": ["arch", "linux", "tutorial"],
+    "file": "posts/arch-install.md"
+  },
+  {
+    "id": "dotfiles",
+    "title": "Meus dotfiles",
+    "date": "2026-03-20",
+    "tags": ["dotfiles", "i3", "zsh", "linux"],
+    "file": "posts/dotfiles.md"
+  },
+  {
+    "id": "hello-world",
+    "title": "Hello World",
+    "date": "2026-03-18",
+    "tags": ["meta"],
+    "file": "posts/hello-world.md"
+  }
+]

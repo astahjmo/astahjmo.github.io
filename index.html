@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>[ ASTAROTH ] - TUI Blog</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/modern-normalize@3.0.1/modern-normalize.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="style.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+</head>
+<body>
+<script>
+// Zen Browser wraps pages in a padded container causing overflow.
+// Detect and compensate only for Zen.
+if(navigator.userAgent.includes('Zen/')){
+  document.documentElement.classList.add('zen');
+}
+</script>
+
+  <!-- ============ BOOT SCREEN ============ -->
+  <div id="boot-screen">
+    <canvas id="boot-matrix"></canvas>
+    <div class="boot-terminal">
+      <div class="boot-terminal-bar">
+        <span class="term-btn term-close"></span>
+        <span class="term-btn term-min"></span>
+        <span class="term-btn term-max"></span>
+        <span class="term-title">astaroth@void:~</span>
+      </div>
+      <div class="boot-terminal-body">
+        <div id="boot-log"></div>
+        <div class="boot-progress-wrap" id="boot-progress-wrap" style="display:none;">
+          <div class="boot-progress-label">[LOADING SYSTEM]</div>
+          <div class="boot-progress-bar">
+            <div class="boot-progress-fill" id="boot-progress-fill"></div>
+          </div>
+          <div class="boot-progress-pct" id="boot-progress-pct">0%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODE SELECT SCREEN ============ -->
+  <div id="mode-select" class="hidden">
+    <div class="mode-select-box">
+      <div class="mode-header">SELECT MODE</div>
+      <div class="mode-title-big">ASTAROTH</div>
+      <div class="mode-body">
+        <div class="mode-options">
+          <div class="mode-option selected" data-mode="vim">
+            <span class="mode-marker">></span>
+            <span class="mode-label">[1] VIM MODE</span>
+            <span class="mode-desc">-- h/j/k/l, gg, G, :commands</span>
+          </div>
+          <div class="mode-option" data-mode="friendly">
+            <span class="mode-marker"> </span>
+            <span class="mode-label">[2] USER-FRIENDLY</span>
+            <span class="mode-desc">-- Mouse, arrows, click</span>
+          </div>
+        </div>
+        <div class="mode-hint">j/k to select | Enter to confirm | 1/2 quick select</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MAIN TUI ============ -->
+  <div id="tui" class="hidden">
+
+    <!-- Top bar -->
+    <div class="tui-topbar">
+      <span class="tui-topbar-left">[ ASTAROTH ]</span>
+      <div class="tui-tabs">
+        <span class="tui-tab active" data-tab="home">F1:Home</span>
+        <span class="tui-tab" data-tab="about">F2:About</span>
+        <span class="tui-tab" data-tab="links">F3:Links</span>
+        <span class="tui-tab" data-tab="guestbook">F4:Guestbook</span>
+      </div>
+      <span class="tui-topbar-right" id="tui-clock">00:00:00</span>
+    </div>
+
+    <!-- Main area -->
+    <div class="tui-main">
+
+      <!-- Left panel -->
+      <div class="tui-panel tui-panel-left" id="panel-left">
+        <div class="tui-panel-title">┤ PROFILE ├</div>
+        <div class="tui-panel-body">
+          <div class="profile-section">
+            <pre class="profile-avatar">
+  ┌──────┐
+  │ ╔══╗ │
+  │ ║▓▓║ │
+  │ ╚══╝ │
+  │ /  \ │
+  └──────┘</pre>
+            <div class="profile-info">
+              <p>Handle: <span class="hl-green">Astaroth</span></p>
+              <p>Status: <span class="hl-green">● Online</span></p>
+              <p>OS:     <span class="hl-white">Arch Linux</span></p>
+              <p>Shell:  <span class="hl-white">zsh</span></p>
+              <p>Editor: <span class="hl-white">neovim</span></p>
+            </div>
+          </div>
+
+          <div class="tui-separator">├──────────────────────┤</div>
+
+          <div class="tui-section-title">NOW PLAYING</div>
+          <div class="now-playing-display">
+            <p class="np-track" id="np-track">► Linkin Park - In The End</p>
+            <div class="np-bar">
+              <div class="np-bar-fill" id="np-bar-fill"></div>
+            </div>
+            <p class="np-controls">[Z]prev  [X]play/pause  [C]next</p>
+          </div>
+
+          <div class="tui-separator">├──────────────────────┤</div>
+
+          <div class="tui-section-title">SYSTEM</div>
+          <div class="system-stats">
+            <p>CPU: <span class="hl-green">[████████░░]</span> 80%</p>
+            <p>RAM: <span class="hl-amber">[██████░░░░]</span> 60%</p>
+            <p>DSK: <span class="hl-green">[███░░░░░░░]</span> 30%</p>
+            <p>NET: <span class="hl-green">▲</span> 4.2MB/s <span class="hl-red">▼</span> 1.1MB/s</p>
+            <p>UP:  <span id="sys-uptime">00:00:00</span></p>
+          </div>
+
+          <div class="tui-separator">├──────────────────────┤</div>
+
+          <div class="tui-section-title">VISITORS</div>
+          <div class="visitor-counter">
+            <span class="counter-digit">0</span><span class="counter-digit">0</span><span class="counter-digit">6</span><span class="counter-digit">6</span><span class="counter-digit">6</span><span class="counter-digit">1</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content panel -->
+      <div class="tui-panel tui-panel-content" id="panel-content">
+        <div class="tui-panel-title" id="content-title">┤ POSTS ├</div>
+        <div class="tui-panel-body tui-scrollable" id="content-body">
+
+          <!-- Tab: home (post list) -->
+          <div class="tab-content active" data-tab="home">
+            <div id="post-list">
+              <p class="hl-dim">Loading posts...</p>
+            </div>
+          </div>
+
+          <!-- Tab: post (single post view) -->
+          <div class="tab-content" data-tab="post">
+            <div id="post-view">
+              <div class="post-nav">
+                <a href="#" id="post-back" class="hl-green">&lt; back to posts</a>
+              </div>
+              <div class="tui-separator-full">─────────────────────────────────────────────────</div>
+              <div id="post-rendered"></div>
+              <div class="tui-separator-full">─────────────────────────────────────────────────</div>
+              <div id="comments-section">
+                <p class="hl-amber">COMMENTS</p>
+                <div id="giscus-container" class="giscus"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab: about -->
+          <div class="tab-content" data-tab="about">
+            <div class="tui-about">
+              <div class="tui-separator-full">─────────────────────────────────────────────────</div>
+              <p class="hl-amber">ABOUT</p>
+              <p></p>
+              <p>Astaroth.</p>
+              <p></p>
+              <div class="tui-separator-full">─────────────────────────────────────────────────</div>
+              <p class="hl-amber">CONTACT</p>
+              <p></p>
+              <p>  GitHub: <a href="#">github.com/astaroth</a></p>
+            </div>
+          </div>
+
+          <!-- Tab: links -->
+          <div class="tab-content" data-tab="links">
+            <p class="hl-amber">LINKS</p>
+            <div class="tui-separator-full">─────────────────────────────────────────────────</div>
+            <p></p>
+            <p class="hl-dim">No links yet.</p>
+          </div>
+
+          <!-- Tab: guestbook -->
+          <div class="tab-content" data-tab="guestbook">
+            <p class="hl-amber">GUESTBOOK</p>
+            <div class="tui-separator-full">─────────────────────────────────────────────────</div>
+            <div class="guestbook-messages" id="guestbook-messages"></div>
+            <div class="tui-separator-full">─────────────────────────────────────────────────</div>
+            <p class="hl-dim">Press [i] to enter INSERT mode and sign the guestbook</p>
+            <div class="gb-form" id="gb-form">
+              <div class="gb-field">
+                <span class="hl-dim">Handle: </span>
+                <input type="text" id="gb-name" placeholder="your_name" class="tui-input">
+              </div>
+              <div class="gb-field">
+                <span class="hl-dim">Message:</span>
+                <input type="text" id="gb-msg" placeholder="leave a message..." class="tui-input">
+              </div>
+              <button class="tui-btn" id="gb-submit">[Enter] SEND</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Right panel -->
+      <div class="tui-panel tui-panel-right" id="panel-right">
+        <div class="tui-panel-title">┤ SHOUTBOX ├</div>
+        <div class="tui-panel-body">
+          <div class="shout-messages" id="shout-messages"></div>
+
+          <div class="tui-separator">├──────────────────────┤</div>
+
+          <div class="tui-section-title">KEYBINDS</div>
+          <div class="keybinds-list" id="keybinds-list">
+            <p><span class="hl-green">j/k</span>    scroll ↓/↑</p>
+            <p><span class="hl-green">h/l</span>    panel ←/→</p>
+            <p><span class="hl-green">gg</span>     go to top</p>
+            <p><span class="hl-green">G</span>      go to bottom</p>
+            <p><span class="hl-green">1-4</span>    switch tab</p>
+            <p><span class="hl-green">i</span>      INSERT mode</p>
+            <p><span class="hl-green">Esc</span>    NORMAL mode</p>
+            <p><span class="hl-green">:</span>      COMMAND mode</p>
+            <p><span class="hl-green">Tab</span>    toggle mode</p>
+            <p><span class="hl-green">F1-F4</span>  tabs</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vim status line -->
+    <div class="tui-statusline">
+      <div class="tui-status-left">
+        <span class="vim-mode" id="vim-mode">NORMAL</span>
+        <span class="vim-file" id="vim-file">~/blog/posts.md</span>
+      </div>
+      <div class="tui-status-center" id="vim-command"></div>
+      <div class="tui-status-right">
+        <span class="vim-encoding">utf-8</span>
+        <span class="vim-pos" id="vim-pos">Ln 1, Col 1</span>
+        <span class="vim-mode-type" id="vim-mode-type">VIM</span>
+      </div>
+    </div>
+
+    <!-- Command line -->
+    <div class="tui-commandline hidden" id="tui-commandline">
+      <span>:</span><input type="text" id="cmd-input">
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
