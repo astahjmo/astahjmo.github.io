@@ -1010,7 +1010,7 @@ tabEls.forEach(t => {
 // =============================================
 // POST SYSTEM (Markdown + LaTeX)
 // =============================================
-const POSTS_FALLBACK = [{"id":"karma-do-desejo","title":"O Karma do Desejo","date":"2026-03-29","tags":["filosofia","psicologia","karma"],"file":"posts/karma-do-desejo.md"}];
+const POSTS_FALLBACK = [{"id":"karma-do-desejo","title":"O Karma do Desejo","date":"2026-03-29","tags":["filosofia","psicologia","karma"],"file":"posts/karma-do-desejo.md","draft":true}];
 
 const postSystem = {
   all: [],
@@ -1018,8 +1018,8 @@ const postSystem = {
   load() {
     fetch('posts.json')
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
-      .then(posts => { this.all = posts; this.renderList(); })
-      .catch(() => { this.all = POSTS_FALLBACK; this.renderList(); });
+      .then(posts => { this.all = posts.filter(p => !p.draft); this.renderList(); })
+      .catch(() => { this.all = POSTS_FALLBACK.filter(p => !p.draft); this.renderList(); });
   },
 
   renderList() {
