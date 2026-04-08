@@ -1010,7 +1010,7 @@ tabEls.forEach(t => {
 // =============================================
 // POST SYSTEM (Markdown + LaTeX)
 // =============================================
-const POSTS_FALLBACK = [{"id":"why-tui","title":"Por que TUI > GUI","date":"2026-03-29","tags":["opinion","tui","linux"],"file":"posts/why-tui.md"},{"id":"neovim-config","title":"Neovim config from scratch","date":"2026-03-27","tags":["neovim","dotfiles","tutorial"],"file":"posts/neovim-config.md"},{"id":"math-beauty","title":"A beleza da matematica","date":"2026-03-25","tags":["math","latex"],"file":"posts/math-beauty.md"},{"id":"arch-install","title":"Instalando Arch Linux do zero","date":"2026-03-22","tags":["arch","linux","tutorial"],"file":"posts/arch-install.md"},{"id":"dotfiles","title":"Meus dotfiles","date":"2026-03-20","tags":["dotfiles","i3","zsh","linux"],"file":"posts/dotfiles.md"},{"id":"hello-world","title":"Hello World","date":"2026-03-18","tags":["meta"],"file":"posts/hello-world.md"}];
+const POSTS_FALLBACK = [{"id":"karma-do-desejo","title":"O Karma do Desejo","date":"2026-03-29","tags":["filosofia","psicologia","karma"],"file":"posts/karma-do-desejo.md"}];
 
 const postSystem = {
   all: [],
@@ -1061,6 +1061,7 @@ const postSystem = {
       const rendered = document.getElementById('post-rendered');
       rendered.innerHTML = typeof marked !== 'undefined' ? marked.parse(md) : md.replace(/\n/g, '<br>');
       self._renderLatex(rendered);
+      self._processFootnotes(rendered);
       self._processLinks(rendered);
       self._loadComments(post.id, post.title);
     });
@@ -1081,46 +1082,98 @@ const postSystem = {
       });
   },
 
+  _processFootnotes(el) {
+    // Turn [1], [2] etc in text into clickable links that scroll to the reference
+    // Also add id anchors to reference definitions
+
+    // Step 1: Add anchors to reference list items (lines starting with [N])
+    el.querySelectorAll('p').forEach(p => {
+      const text = p.textContent;
+      const match = text.match(/^\[(\d+[a-z]?)\]/);
+      if (match) {
+        p.id = 'ref-' + match[1];
+        p.classList.add('footnote-def');
+      }
+    });
+
+    // Step 2: Turn inline [N] references into clickable superscript links
+    el.querySelectorAll('p, li, blockquote').forEach(node => {
+      if (node.classList.contains('footnote-def')) return; // skip reference definitions
+      node.innerHTML = node.innerHTML.replace(
+        /\[(\d+[a-z]?)\]/g,
+        '<a href="#ref-$1" class="footnote-link" title="Ver referência [$1]"><sup>[$1]</sup></a>'
+      );
+    });
+
+    // Step 3: Make footnote links scroll smoothly within the panel
+    el.querySelectorAll('.footnote-link').forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = document.getElementById(a.getAttribute('href').slice(1));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          target.classList.add('footnote-highlight');
+          setTimeout(() => target.classList.remove('footnote-highlight'), 2000);
+        }
+      });
+    });
+  },
+
   _processLinks(el) {
+    const self = this;
+
     el.querySelectorAll('a[href]').forEach(a => {
       const href = a.getAttribute('href');
 
-      // Internal post link: href="post:post-id" or href="#post-id"
+      // Detect link type
       const postMatch = href.match(/^(?:post:|#)(.+)$/);
-      if (postMatch) {
-        const targetId = postMatch[1];
+      const isMd = href.endsWith('.md');
+      const isExternal = href.startsWith('http://') || href.startsWith('https://');
+
+      let internalId = null;
+      if (postMatch) internalId = postMatch[1];
+      else if (isMd) internalId = href.replace(/^posts\//, '').replace(/\.md$/, '');
+
+      // Internal post link
+      if (internalId) {
         a.addEventListener('click', (e) => {
           e.preventDefault();
-          const target = this.all.find(p => p.id === targetId);
-          if (target) {
-            this.open(targetId); // pushes new depth on nav stack
-          }
+          linkPreview.hide();
+          if (self.all.find(p => p.id === internalId)) self.open(internalId);
         });
         a.style.cursor = 'pointer';
         a.removeAttribute('target');
-        return;
+        a.dataset.previewType = 'internal';
+        a.dataset.previewId = internalId;
       }
 
-      // External link: open in new tab
-      if (href.startsWith('http://') || href.startsWith('https://')) {
+      // External link
+      if (isExternal) {
         a.setAttribute('target', '_blank');
         a.setAttribute('rel', 'noopener noreferrer');
-        return;
+        a.dataset.previewType = 'external';
+        a.dataset.previewUrl = href;
       }
 
-      // Relative link to a .md file: treat as internal post
-      if (href.endsWith('.md')) {
-        const id = href.replace(/^posts\//, '').replace(/\.md$/, '');
-        a.addEventListener('click', (e) => {
-          e.preventDefault();
-          const target = this.all.find(p => p.id === id);
-          if (target) {
-            this.open(id);
-          }
+      // Hover preview for all links
+      if (internalId || isExternal) {
+        let hoverTimer = null;
+
+        a.addEventListener('mouseenter', (e) => {
+          hoverTimer = setTimeout(() => {
+            const rect = a.getBoundingClientRect();
+            if (a.dataset.previewType === 'internal') {
+              linkPreview.showInternal(a.dataset.previewId, rect);
+            } else {
+              linkPreview.showExternal(a.dataset.previewUrl, rect);
+            }
+          }, 400);
         });
-        a.style.cursor = 'pointer';
-        a.removeAttribute('target');
-        return;
+
+        a.addEventListener('mouseleave', () => {
+          clearTimeout(hoverTimer);
+          linkPreview.scheduleHide();
+        });
       }
     });
   },
@@ -1144,7 +1197,7 @@ const postSystem = {
   GISCUS_REPO: 'astahjmo/astahjmo.github.io',
   GISCUS_REPO_ID: 'R_kgDOR0Dc_g',
   GISCUS_CATEGORY: 'Announcements',
-  GISCUS_CATEGORY_ID: 'DIC_kwDOR0Dc_s4C5jta'
+  GISCUS_CATEGORY_ID: 'DIC_kwDOR0Dc_s4C5jta',
 
   _loadComments(postId, postTitle) {
     const container = document.getElementById('giscus-container');
@@ -1256,6 +1309,91 @@ search.results.addEventListener('click', (e) => {
     vim.setMode('NORMAL');
     postSystem.open(r.dataset.id);
   }
+});
+
+// =============================================
+// LINK PREVIEW (hover pane)
+// =============================================
+const previewPane = document.createElement('div');
+previewPane.id = 'link-preview';
+previewPane.className = 'link-preview hidden';
+previewPane.innerHTML = `
+  <div class="preview-header float-header">
+    <span class="preview-title hl-dim"></span>
+    <span class="preview-close hl-dim" style="cursor:pointer">x</span>
+  </div>
+  <div class="preview-body"></div>
+`;
+document.getElementById('tui').appendChild(previewPane);
+
+const linkPreview = {
+  el: previewPane,
+  header: previewPane.querySelector('.preview-title'),
+  body: previewPane.querySelector('.preview-body'),
+  hideTimer: null,
+  visible: false,
+
+  show(rect) {
+    clearTimeout(this.hideTimer);
+    // Position near the link
+    const x = Math.min(rect.left, window.innerWidth - 420);
+    const y = rect.bottom + 8;
+    const maxY = window.innerHeight - 350;
+
+    this.el.style.left = Math.max(10, x) + 'px';
+    this.el.style.top = Math.min(y, maxY) + 'px';
+    this.el.classList.remove('hidden');
+    this.visible = true;
+
+    // Init drag
+    panes._initDrag(this.el);
+  },
+
+  hide() {
+    clearTimeout(this.hideTimer);
+    this.el.classList.add('hidden');
+    this.body.innerHTML = '';
+    this.visible = false;
+  },
+
+  scheduleHide() {
+    this.hideTimer = setTimeout(() => this.hide(), 300);
+  },
+
+  showInternal(postId, rect) {
+    const post = postSystem.all.find(p => p.id === postId);
+    if (!post) return;
+
+    this.header.textContent = post.title;
+    this.body.innerHTML = '<p class="hl-dim">Loading...</p>';
+    this.show(rect);
+
+    const self = this;
+    postSystem._fetch(post.file, function(md) {
+      // Render preview (truncated)
+      let html = typeof marked !== 'undefined' ? marked.parse(md) : md.replace(/\n/g, '<br>');
+      self.body.innerHTML = '<div class="preview-content">' + html + '</div>';
+    });
+  },
+
+  showExternal(url, rect) {
+    this.header.textContent = url.replace(/^https?:\/\//, '').split('/')[0];
+    this.body.innerHTML = `<iframe src="${url}" class="preview-iframe" sandbox="allow-scripts allow-same-origin"></iframe>`;
+    this.show(rect);
+  }
+};
+
+// Keep preview visible when hovering the pane itself
+previewPane.addEventListener('mouseenter', () => {
+  clearTimeout(linkPreview.hideTimer);
+});
+previewPane.addEventListener('mouseleave', () => {
+  linkPreview.scheduleHide();
+});
+
+// Close button
+previewPane.querySelector('.preview-close').addEventListener('click', () => {
+  linkPreview.hide();
 });
 
 // =============================================

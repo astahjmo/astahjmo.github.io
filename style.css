@@ -531,6 +531,79 @@ body.theme-light .hop-label { background: #886600; color: #fff; }
 /* VISUAL mode indicator */
 .vim-mode.mode-visual { background: #5f005f; color: #d75fff; }
 
+/* --- Link Preview Pane --- */
+.link-preview {
+  position: fixed;
+  width: 400px;
+  max-height: 320px;
+  background: #111;
+  border: 1px solid var(--green);
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.1), 0 4px 16px rgba(0, 0, 0, 0.8);
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  background: #1a1a1a;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  cursor: move;
+}
+
+.preview-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.preview-close { padding: 0 4px; font-size: 16px; }
+.preview-close:hover { color: var(--red); }
+
+.preview-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+}
+
+.preview-content {
+  padding: 10px;
+  font-size: 14px;
+  line-height: 1.6;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.preview-content h1 { font-size: 18px; color: var(--green); margin: 8px 0 4px; }
+.preview-content h2 { font-size: 16px; color: var(--amber); margin: 6px 0 4px; }
+.preview-content p { margin-bottom: 6px; }
+.preview-content pre { background: #0a0a0a; padding: 6px; overflow-x: auto; font-size: 12px; border: 1px solid var(--border); }
+.preview-content code { font-size: 12px; }
+.preview-content img { max-width: 100%; }
+
+.preview-iframe {
+  width: 100%;
+  height: 260px;
+  border: none;
+  background: #fff;
+}
+
+/* Preview - light theme */
+body.theme-light .link-preview { background: #f0f0f0; border-color: var(--green); box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+body.theme-light .preview-header { background: #ddd; }
+body.theme-light .preview-content pre { background: #e8e8e8; }
+
+/* Links with preview get a subtle indicator */
+a[data-preview-type] { border-bottom: 1px dashed var(--dim-green); }
+a[data-preview-type="external"]::after { content: ' ↗'; font-size: 0.8em; opacity: 0.5; }
+
 /* --- Comments (giscus) --- */
 #comments-section { margin-top: 8px; }
 .giscus { margin-top: 8px; min-height: 100px; }
