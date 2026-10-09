@@ -246,33 +246,12 @@ const navStack = {
 };
 
 // =============================================
-// PANE MANAGER
+// SCROLL VIEW + FLOATING PANES
 // =============================================
 const panes = {
-  list: [
-    { id: 'panel-left', name: 'PROFILE', el: document.getElementById('panel-left') },
-    { id: 'panel-content', name: 'CONTENT', el: document.getElementById('panel-content') },
-    { id: 'panel-right', name: 'SHOUTBOX', el: document.getElementById('panel-right') },
-  ],
-  active: 1,
   floating: null, // currently open floating pane
 
-  focus(idx) {
-    if (idx < 0 || idx >= this.list.length) return;
-    this.active = idx;
-    this.list.forEach((p, i) => {
-      if (p.el) p.el.classList.toggle('panel-focus', i === idx);
-    });
-    vim.updateStatus();
-  },
-
-  focusLeft() { this.focus(Math.max(0, this.active - 1)); },
-  focusRight() { this.focus(Math.min(this.list.length - 1, this.active + 1)); },
-
-  getScrollable() {
-    const p = this.list[this.active];
-    return p && p.el ? p.el.querySelector('.tui-panel-body') : null;
-  },
+  getScrollable() { return document.getElementById('content-body'); },
 
   scroll(amount) {
     const el = this.getScrollable();
@@ -332,11 +311,6 @@ const panes = {
   }
 };
 
-// Click to focus panes
-panes.list.forEach((p, i) => {
-  if (p.el) p.el.addEventListener('mousedown', () => panes.focus(i));
-});
-
 // =============================================
 // VIM ENGINE
 // =============================================
@@ -374,16 +348,20 @@ const vim = {
   updateStatus() {
     const cur = navStack.current();
     const tabFiles = { home: 'posts.md', about: 'about.md', links: 'links.md', guestbook: 'guestbook.md', post: 'post.md' };
-    const panelNames = ['~/profile', null, '~/shoutbox'];
-    if (panes.active === 1) {
-      const depth = navStack.depth() > 1 ? ` [${navStack.depth()}]` : '';
-      this.fileEl.textContent = `~/blog/${tabFiles[cur.view] || 'posts.md'}${depth}`;
-    } else {
-      this.fileEl.textContent = panelNames[panes.active] || '';
-    }
+    const depth = navStack.depth() > 1 ? ` [${navStack.depth()}]` : '';
+    this.fileEl.textContent = `~/blog/${tabFiles[cur.view] || 'posts.md'}${depth}`;
     const el = panes.getScrollable();
     const ln = el ? Math.max(1, Math.ceil(el.scrollTop / 24) + 1) : 1;
     this.posEl.textContent = `Ln ${ln}`;
+  },
+
+  cycleTab(dir) {
+    const order = ['home', 'about', 'links', 'guestbook'];
+    const cur = navStack.current().view;
+    const i = order.indexOf(cur);
+    const next = i === -1 ? 0 : (i + dir + order.length) % order.length;
+    navStack.reset(order[next]);
+    this.showMsg(`-- ${order[next].toUpperCase()} --`);
   },
 
   getCount() {
@@ -662,7 +640,7 @@ const vim = {
     // --- NORMAL MODE ---
 
     // Block browser defaults for vim keys
-    if (this.isVimNav && /^[hjklgGiIfvyY/:1234zxc]$/.test(key)) {
+    if (this.isVimNav && /^[hjklgGiIfvyY/:1234]$/.test(key)) {
       e.preventDefault();
       e.stopPropagation();
     }
@@ -839,17 +817,15 @@ const vim = {
       return;
     }
 
-    // h/ArrowLeft - focus left pane
+    // h/ArrowLeft - previous tab
     if (key === 'h' || key === 'ArrowLeft') {
-      panes.focusLeft();
-      this.showMsg(`-- ${panes.list[panes.active].name} --`);
+      this.cycleTab(-1);
       return;
     }
 
-    // l/ArrowRight - focus right pane
+    // l/ArrowRight - next tab
     if (key === 'l' || key === 'ArrowRight') {
-      panes.focusRight();
-      this.showMsg(`-- ${panes.list[panes.active].name} --`);
+      this.cycleTab(1);
       return;
     }
 
@@ -898,11 +874,6 @@ const vim = {
     // Ctrl+d/u half page
     if (key === 'd' && e.ctrlKey) { panes.scroll(400); this.updateStatus(); return; }
     if (key === 'u' && e.ctrlKey) { panes.scroll(-400); this.updateStatus(); return; }
-
-    // z/x/c music
-    if (key === 'z') { music.prev(); return; }
-    if (key === 'x') { music.toggle(); return; }
-    if (key === 'c') { music.next(); return; }
   },
 
   exitCommand() {
@@ -996,6 +967,7 @@ const contentViews = {
     }
 
     contentBody.scrollTop = 0;
+    scheduleGutterAlign();
   }
 };
 
@@ -1010,7 +982,7 @@ tabEls.forEach(t => {
 // =============================================
 // POST SYSTEM (Markdown + LaTeX)
 // =============================================
-const POSTS_FALLBACK = [{"id":"karma-do-desejo","title":"O Karma do Desejo","date":"2026-03-29","tags":["filosofia","psicologia","karma"],"file":"posts/karma-do-desejo.md","draft":true}];
+const POSTS_FALLBACK = [{"id":"exemplo","title":"Post de exemplo","date":"2026-10-09","tags":["meta","exemplo"],"file":"posts/exemplo.md","draft":false},{"id":"karma-do-desejo","title":"O Karma do Desejo","date":"2026-03-29","tags":["filosofia","psicologia","karma"],"file":"posts/karma-do-desejo.md","draft":true}];
 
 const postSystem = {
   all: [],
@@ -1032,11 +1004,10 @@ const postSystem = {
       `<div class="tui-post" data-index="${i}" data-post-id="${p.id}">
         <div class="post-head">
           <span class="post-idx hl-dim">[${String(i + 1).padStart(2, '0')}]</span>
-          <span class="post-title hl-green">${p.title}</span>
+          <span class="post-title">${p.title}</span>
         </div>
         <div class="post-meta hl-dim">${p.date} | ${p.tags.map(t => '#' + t).join(' ')}</div>
-      </div>` +
-      (i < this.all.length - 1 ? '<div class="tui-separator-full">─────────────────────────────────────────────────</div>' : '')
+      </div>`
     ).join('');
 
     container.querySelectorAll('.tui-post').forEach(el => {
@@ -1397,65 +1368,6 @@ previewPane.querySelector('.preview-close').addEventListener('click', () => {
 });
 
 // =============================================
-// MUSIC PLAYER
-// =============================================
-const music = {
-  songs: [
-    'Linkin Park - In The End',
-    'System of a Down - Chop Suey!',
-    'Slipknot - Duality',
-    'Disturbed - Down With The Sickness',
-    'RATM - Killing In The Name',
-    'Korn - Freak On A Leash',
-    'Papa Roach - Last Resort',
-    'Deftones - Change',
-    'Tool - Schism',
-    'Mudvayne - Dig'
-  ],
-  current: 0,
-  playing: true,
-
-  update() {
-    const el = document.getElementById('np-track');
-    if (el) el.textContent = `${this.playing ? '>' : '|'} ${this.songs[this.current]}`;
-  },
-
-  next() {
-    this.current = (this.current + 1) % this.songs.length;
-    this.update();
-    this._resetBar();
-    vim.showMsg(`Now playing: ${this.songs[this.current]}`);
-  },
-
-  prev() {
-    this.current = (this.current - 1 + this.songs.length) % this.songs.length;
-    this.update();
-    this._resetBar();
-    vim.showMsg(`Now playing: ${this.songs[this.current]}`);
-  },
-
-  toggle() {
-    this.playing = !this.playing;
-    this.update();
-    const fill = document.getElementById('np-bar-fill');
-    if (fill) fill.style.animationPlayState = this.playing ? 'running' : 'paused';
-    vim.showMsg(this.playing ? '> Playing' : '| Paused');
-  },
-
-  _resetBar() {
-    const fill = document.getElementById('np-bar-fill');
-    if (fill) {
-      fill.style.animation = 'none';
-      fill.offsetHeight;
-      fill.style.animation = 'npProgress 15s linear infinite';
-      fill.style.animationPlayState = this.playing ? 'running' : 'paused';
-    }
-  }
-};
-
-music.update();
-
-// =============================================
 // UTILITIES
 // =============================================
 
@@ -1466,17 +1378,6 @@ music.update();
   function tick() { el.textContent = new Date().toTimeString().slice(0, 8); }
   tick();
   setInterval(tick, 1000);
-})();
-
-// Uptime
-(function() {
-  const el = document.getElementById('sys-uptime');
-  if (!el) return;
-  let sec = 0;
-  setInterval(() => {
-    sec++;
-    el.textContent = [sec/3600|0, (sec%3600)/60|0, sec%60].map(n => String(n).padStart(2,'0')).join(':');
-  }, 1000);
 })();
 
 // Guestbook
@@ -1499,47 +1400,120 @@ music.update();
 })();
 
 // =============================================
-// PAGE GUTTER (rune.build style line numbers)
+// PAGE GUTTER (continuous 24px line numbers)
 // =============================================
-const GUTTER_LINE = 24;
+const GUTTER_CELL = 24;
 const gutterEl = document.getElementById('page-gutter');
 let gutterLines = [];
+let gutterAligning = false;
+let gutterAlignTimer = null;
 
-function fillGutter() {
+function alignGutter() {
   if (!gutterEl) return;
-  const count = Math.max(1, Math.floor(gutterEl.clientHeight / GUTTER_LINE));
-  if (gutterLines.length !== count) {
-    gutterEl.innerHTML = '';
-    gutterLines = [];
-    for (let i = 1; i <= count; i++) {
-      const span = document.createElement('span');
-      span.textContent = i;
-      gutterEl.appendChild(span);
-      gutterLines.push(span);
+  gutterAligning = true;
+  gutterEl.innerHTML = '';
+  gutterLines = [];
+
+  const height = Math.max(contentBody.scrollHeight, contentBody.clientHeight);
+  const count = Math.ceil(height / GUTTER_CELL);
+  for (let i = 0; i < count; i++) {
+    const span = document.createElement('span');
+    span.textContent = i + 1;
+    span.style.top = (i * GUTTER_CELL + 15) + 'px';
+    gutterEl.appendChild(span);
+    gutterLines.push(span);
+  }
+
+  // Mark the cells covered by display-size text (multi-cell blocks)
+  const root = contentBody.querySelector('.tab-content.active');
+  if (root) {
+    const base = contentBody.getBoundingClientRect().top - contentBody.scrollTop;
+    const marked = new Set();
+    const sizeCache = new Map();
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        return node.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+      }
+    });
+    let node;
+    while ((node = walker.nextNode())) {
+      const parent = node.parentElement;
+      if (!parent) continue;
+      let fontSize = sizeCache.get(parent);
+      if (fontSize === undefined) {
+        fontSize = parseFloat(getComputedStyle(parent).fontSize);
+        sizeCache.set(parent, fontSize);
+      }
+      if (fontSize < 24) continue;
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      const rects = range.getClientRects();
+      for (let i = 0; i < rects.length; i++) {
+        const r = rects[i];
+        if (r.height < 4) continue;
+        const first = Math.max(0, Math.floor((r.top - base) / GUTTER_CELL));
+        const last = Math.min(gutterLines.length - 1, Math.floor((r.bottom - base - 1) / GUTTER_CELL));
+        for (let c = first; c <= last; c++) marked.add(c);
+      }
+    }
+    marked.forEach((i) => gutterLines[i] && gutterLines[i].classList.add('gutter-hl-block'));
+
+    // Mark component boxes that span the grid (buttons, rows, boxes, media)
+    const boxSelector = '.cta-row, .btn, .install-box, .tui-post, .link-row, .about-profile, #post-rendered pre, #post-rendered img, #post-rendered table';
+    const boxes = root.querySelectorAll(boxSelector);
+    for (let b = 0; b < boxes.length; b++) {
+      const r = boxes[b].getBoundingClientRect();
+      if (r.height < 4 || r.width < 4) continue;
+      const first = Math.max(0, Math.floor((r.top - base) / GUTTER_CELL));
+      const last = Math.min(gutterLines.length - 1, Math.floor((r.bottom - base - 1) / GUTTER_CELL));
+      for (let c = first; c <= last; c++) {
+        if (gutterLines[c]) gutterLines[c].classList.add('gutter-hl-block');
+      }
     }
   }
+
   highlightGutter();
+  gutterAligning = false;
 }
 
 function highlightGutter() {
   if (!gutterLines.length) return;
-  const idx = Math.min(gutterLines.length - 1, Math.max(0, Math.round(contentBody.scrollTop / GUTTER_LINE)));
+  const idx = Math.min(gutterLines.length - 1, Math.max(0, Math.floor((contentBody.scrollTop + GUTTER_CELL / 2) / GUTTER_CELL)));
   gutterLines.forEach((el, i) => el.classList.toggle('gutter-hl', i === idx));
 }
 
+function scheduleGutterAlign() {
+  clearTimeout(gutterAlignTimer);
+  gutterAlignTimer = setTimeout(alignGutter, 60);
+}
+
 contentBody.addEventListener('scroll', highlightGutter, { passive: true });
-let gutterResizeTimer = null;
-window.addEventListener('resize', () => {
-  clearTimeout(gutterResizeTimer);
-  gutterResizeTimer = setTimeout(fillGutter, 120);
+
+const gutterObserver = new MutationObserver((mutations) => {
+  if (gutterAligning) return;
+  if (mutations.every(m => gutterEl && (m.target === gutterEl || gutterEl.contains(m.target)))) return;
+  scheduleGutterAlign();
 });
-fillGutter();
+gutterObserver.observe(contentBody, { childList: true, subtree: true, characterData: true });
+
+window.addEventListener('resize', scheduleGutterAlign);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(alignGutter);
+
+alignGutter();
+
+// Hero CTAs
+const ctaLatest = document.getElementById('cta-latest');
+if (ctaLatest) {
+  ctaLatest.addEventListener('click', () => {
+    if (postSystem.all.length) postSystem.open(postSystem.all[0].id);
+    else vim.showMsg('sem textos publicados ainda');
+  });
+}
 
 // Load posts
 postSystem.load();
 
-// Focus & status
-panes.focus(1);
+// Status
 vim.updateStatus();
 
 } // end initTUI

@@ -29,9 +29,6 @@ if(navigator.userAgent.includes('Zen/')){
     <canvas id="boot-matrix"></canvas>
     <div class="boot-terminal">
       <div class="boot-terminal-bar">
-        <span class="term-btn term-close"></span>
-        <span class="term-btn term-min"></span>
-        <span class="term-btn term-max"></span>
         <span class="term-title">astaroth@void:~</span>
       </div>
       <div class="boot-terminal-body">
@@ -75,7 +72,6 @@ if(navigator.userAgent.includes('Zen/')){
 
     <!-- Top bar -->
     <div class="tui-topbar">
-      <span class="traffic" aria-hidden="true"><span class="r"></span><span class="y"></span><span class="g"></span></span>
       <span class="tui-topbar-left">astaroth</span>
       <div class="tui-tabs">
         <span class="tui-tab active" data-tab="home">F1:Home</span>
@@ -86,86 +82,42 @@ if(navigator.userAgent.includes('Zen/')){
       <span class="tui-topbar-right" id="tui-clock">00:00:00</span>
     </div>
 
-    <!-- Main area -->
+    <!-- Main area: full-width single column -->
     <div class="tui-main">
 
-      <div class="page-gutter" id="page-gutter" aria-hidden="true"></div>
+      <div class="tui-content-wrap">
+        <div class="tui-content-header" id="content-title">// posts</div>
+        <div class="tui-content tui-scrollable" id="content-body">
 
-      <!-- Left panel -->
-      <div class="tui-panel tui-panel-left" id="panel-left">
-        <div class="tui-panel-title">// profile</div>
-        <div class="tui-panel-body">
-          <div class="profile-section">
-            <pre class="profile-avatar">
-  ┌──────┐
-  │ ╔══╗ │
-  │ ║▓▓║ │
-  │ ╚══╝ │
-  │ /  \ │
-  └──────┘</pre>
-            <div class="profile-info">
-              <p>Handle: <span class="hl-green">Astaroth</span></p>
-              <p>Status: <span class="hl-green">● Online</span></p>
-              <p>OS:     <span class="hl-white">Arch Linux</span></p>
-              <p>Shell:  <span class="hl-white">zsh</span></p>
-              <p>Editor: <span class="hl-white">neovim</span></p>
-            </div>
-          </div>
+          <div class="page-gutter" id="page-gutter" aria-hidden="true"></div>
 
-          <div class="tui-separator">├──────────────────────┤</div>
-
-          <div class="tui-section-title">NOW PLAYING</div>
-          <div class="now-playing-display">
-            <p class="np-track" id="np-track">► Linkin Park - In The End</p>
-            <div class="np-bar">
-              <div class="np-bar-fill" id="np-bar-fill"></div>
-            </div>
-            <p class="np-controls">[Z]prev  [X]play/pause  [C]next</p>
-          </div>
-
-          <div class="tui-separator">├──────────────────────┤</div>
-
-          <div class="tui-section-title">SYSTEM</div>
-          <div class="system-stats">
-            <p>CPU: <span class="hl-green">[████████░░]</span> 80%</p>
-            <p>RAM: <span class="hl-amber">[██████░░░░]</span> 60%</p>
-            <p>DSK: <span class="hl-green">[███░░░░░░░]</span> 30%</p>
-            <p>NET: <span class="hl-green">▲</span> 4.2MB/s <span class="hl-red">▼</span> 1.1MB/s</p>
-            <p>UP:  <span id="sys-uptime">00:00:00</span></p>
-          </div>
-
-          <div class="tui-separator">├──────────────────────┤</div>
-
-          <div class="tui-section-title">VISITORS</div>
-          <div class="visitor-counter">
-            <span class="counter-digit">0</span><span class="counter-digit">0</span><span class="counter-digit">6</span><span class="counter-digit">6</span><span class="counter-digit">6</span><span class="counter-digit">1</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Content panel -->
-      <div class="tui-panel tui-panel-content" id="panel-content">
-        <div class="tui-panel-title" id="content-title">// posts</div>
-        <div class="tui-panel-body tui-scrollable" id="content-body">
-
-          <!-- Tab: home (post list) -->
+          <!-- Tab: home (hero + post list) -->
           <div class="tab-content active" data-tab="home">
-            <div id="post-list">
-              <p class="hl-dim">Loading posts...</p>
-            </div>
+            <section class="hero">
+              <span class="sec-label">astaroth</span>
+              <h1>Um blog sobre o que não sai da cabeça.</h1>
+              <p class="subhead">Filosofia, matemática, psicologia e tecnologia.</p>
+              <div class="cta-row">
+                <button class="btn primary" id="cta-latest">ler o último texto <span class="arrow">&rarr;</span></button>
+              </div>
+            </section>
+            <section class="posts-section">
+              <span class="sec-label">textos</span>
+              <div id="post-list">
+                <p class="hl-dim">Loading posts...</p>
+              </div>
+            </section>
           </div>
 
           <!-- Tab: post (single post view) -->
           <div class="tab-content" data-tab="post">
             <div id="post-view">
               <div class="post-nav">
-                <a href="#" id="post-back" class="hl-green">&lt; back to posts</a>
+                <a href="#" id="post-back">&lt; back to posts</a>
               </div>
-              <div class="tui-separator-full">─────────────────────────────────────────────────</div>
               <div id="post-rendered"></div>
-              <div class="tui-separator-full">─────────────────────────────────────────────────</div>
               <div id="comments-section">
-                <p class="hl-amber">COMMENTS</p>
+                <span class="sec-label">comments</span>
                 <div id="giscus-container" class="giscus"></div>
               </div>
             </div>
@@ -174,70 +126,59 @@ if(navigator.userAgent.includes('Zen/')){
           <!-- Tab: about -->
           <div class="tab-content" data-tab="about">
             <div class="tui-about">
-              <div class="tui-separator-full">─────────────────────────────────────────────────</div>
-              <p class="hl-amber">ABOUT</p>
-              <p></p>
-              <p>Astaroth.</p>
-              <p></p>
-              <div class="tui-separator-full">─────────────────────────────────────────────────</div>
-              <p class="hl-amber">CONTACT</p>
-              <p></p>
-              <p>  GitHub: <a href="#">github.com/astaroth</a></p>
+              <span class="sec-label">about</span>
+              <h1>Astaroth.</h1>
+              <p>Escrevo sobre filosofia, mente e código — este blog é onde isso aterrissa.</p>
+              <pre class="about-profile"><span class="hl-green">handle</span>:  Astaroth
+<span class="hl-green">status</span>:  &bull; online
+<span class="hl-green">os</span>:      Arch Linux
+<span class="hl-green">shell</span>:   zsh
+<span class="hl-green">editor</span>:  neovim</pre>
+              <h2>// contato</h2>
+              <p>GitHub: <a href="https://github.com/astahjmo" target="_blank" rel="noopener noreferrer">github.com/astahjmo</a></p>
+              <h2>// atalhos</h2>
+              <div class="keybinds">
+                <p><span class="key">j</span><span class="key">k</span> scroll / navegar</p>
+                <p><span class="key">h</span><span class="key">l</span> aba anterior / pr&oacute;xima</p>
+                <p><span class="key">gg</span><span class="key">G</span> topo / fim</p>
+                <p><span class="key">1-4</span> trocar aba</p>
+                <p><span class="key">Enter</span> abrir</p>
+                <p><span class="key">i</span><span class="key">Esc</span> INSERT / NORMAL</p>
+                <p><span class="key">:</span> command mode</p>
+                <p><span class="key">/</span> buscar</p>
+                <p><span class="key">f</span> hop (num post)</p>
+                <p><span class="key">v</span><span class="key">y</span> selecionar / copiar</p>
+                <p><span class="key">Tab</span> alternar VIM/FRIENDLY</p>
+              </div>
             </div>
           </div>
 
           <!-- Tab: links -->
           <div class="tab-content" data-tab="links">
-            <p class="hl-amber">LINKS</p>
-            <div class="tui-separator-full">─────────────────────────────────────────────────</div>
-            <p></p>
-            <p class="hl-dim">No links yet.</p>
+            <span class="sec-label">links</span>
+            <div class="links-list">
+              <a class="link-row" href="https://github.com/astahjmo" target="_blank" rel="noopener noreferrer">github.com/astahjmo<span class="ext">&nearr;</span></a>
+            </div>
           </div>
 
           <!-- Tab: guestbook -->
           <div class="tab-content" data-tab="guestbook">
-            <p class="hl-amber">GUESTBOOK</p>
-            <div class="tui-separator-full">─────────────────────────────────────────────────</div>
+            <span class="sec-label">guestbook</span>
             <div class="guestbook-messages" id="guestbook-messages"></div>
-            <div class="tui-separator-full">─────────────────────────────────────────────────</div>
-            <p class="hl-dim">Press [i] to enter INSERT mode and sign the guestbook</p>
             <div class="gb-form" id="gb-form">
               <div class="gb-field">
-                <span class="hl-dim">Handle: </span>
+                <span class="gb-label">handle</span>
                 <input type="text" id="gb-name" placeholder="your_name" class="tui-input">
               </div>
               <div class="gb-field">
-                <span class="hl-dim">Message:</span>
+                <span class="gb-label">mensagem</span>
                 <input type="text" id="gb-msg" placeholder="leave a message..." class="tui-input">
               </div>
               <button class="tui-btn" id="gb-submit">[Enter] SEND</button>
             </div>
+            <p class="hl-dim gb-hint">Press [i] to enter INSERT mode and sign the guestbook</p>
           </div>
 
-        </div>
-      </div>
-
-      <!-- Right panel -->
-      <div class="tui-panel tui-panel-right" id="panel-right">
-        <div class="tui-panel-title">// shoutbox</div>
-        <div class="tui-panel-body">
-          <div class="shout-messages" id="shout-messages"></div>
-
-          <div class="tui-separator">├──────────────────────┤</div>
-
-          <div class="tui-section-title">KEYBINDS</div>
-          <div class="keybinds-list" id="keybinds-list">
-            <p><span class="hl-green">j/k</span>    scroll ↓/↑</p>
-            <p><span class="hl-green">h/l</span>    panel ←/→</p>
-            <p><span class="hl-green">gg</span>     go to top</p>
-            <p><span class="hl-green">G</span>      go to bottom</p>
-            <p><span class="hl-green">1-4</span>    switch tab</p>
-            <p><span class="hl-green">i</span>      INSERT mode</p>
-            <p><span class="hl-green">Esc</span>    NORMAL mode</p>
-            <p><span class="hl-green">:</span>      COMMAND mode</p>
-            <p><span class="hl-green">Tab</span>    toggle mode</p>
-            <p><span class="hl-green">F1-F4</span>  tabs</p>
-          </div>
         </div>
       </div>
     </div>
