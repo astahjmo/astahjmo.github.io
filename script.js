@@ -982,7 +982,7 @@ tabEls.forEach(t => {
 // =============================================
 // POST SYSTEM (Markdown + LaTeX)
 // =============================================
-const POSTS_FALLBACK = [{"id":"exemplo","title":"Post de exemplo","date":"2026-10-09","tags":["meta","exemplo"],"file":"posts/exemplo.md","draft":false},{"id":"karma-do-desejo","title":"O Karma do Desejo","date":"2026-03-29","tags":["filosofia","psicologia","karma"],"file":"posts/karma-do-desejo.md","draft":true}];
+const POSTS_FALLBACK = [{"id":"exemplo","title":"Post de exemplo","date":"2026-10-09","tags":["meta","exemplo"],"file":"posts/exemplo.md","draft":false}];
 
 const postSystem = {
   all: [],
