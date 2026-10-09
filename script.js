@@ -51,9 +51,9 @@ try {
     matrixCanvas.height = window.innerHeight;
 
     const isLight = document.body.classList.contains('theme-light');
-    const matrixColor = isLight ? '#006b1f' : '#00ff41';
-    const matrixHighlight = isLight ? '#004410' : '#ffffff';
-    const matrixFade = isLight ? 'rgba(232, 232, 232, 0.06)' : 'rgba(0, 0, 0, 0.06)';
+    const matrixColor = isLight ? '#4f7d2f' : '#98be65';
+    const matrixHighlight = isLight ? '#1a1a1a' : '#ecbe7b';
+    const matrixFade = isLight ? 'rgba(242, 242, 242, 0.06)' : 'rgba(0, 0, 0, 0.06)';
 
     const fontSize = 16;
     const cols = Math.floor(matrixCanvas.width / fontSize);
@@ -382,7 +382,7 @@ const vim = {
       this.fileEl.textContent = panelNames[panes.active] || '';
     }
     const el = panes.getScrollable();
-    const ln = el ? Math.max(1, Math.ceil(el.scrollTop / 20) + 1) : 1;
+    const ln = el ? Math.max(1, Math.ceil(el.scrollTop / 24) + 1) : 1;
     this.posEl.textContent = `Ln ${ln}`;
   },
 
@@ -928,7 +928,7 @@ const vim = {
       'theme light': () => { document.body.classList.add('theme-light'); try{localStorage.setItem('astaroth-theme','light')}catch(e){} this.showMsg('Theme: light'); },
       'theme white': () => { document.body.classList.add('theme-light'); try{localStorage.setItem('astaroth-theme','light')}catch(e){} this.showMsg('Theme: light'); },
       'tabs': () => this.showMsg('1:Home 2:About 3:Links 4:Guestbook'),
-      'version': () => this.showMsg('ASTAROTH TUI Blog v2.0 -- Pane+NavStack+Vim Engine'),
+      'version': () => this.showMsg('ASTAROTH TUI Blog v3.0 -- rune skin'),
     };
 
     if (cmd.startsWith('tab ')) {
@@ -987,9 +987,9 @@ const contentViews = {
     tabEls.forEach(t => t.classList.toggle('active', t.dataset.tab === tabMap[view]));
     tabContents.forEach(tc => tc.classList.toggle('active', tc.dataset.tab === (view === 'post' ? 'post' : view)));
 
-    const titles = { home: 'POSTS', about: 'ABOUT', links: 'LINKS', guestbook: 'GUESTBOOK', post: data ? data.title || 'POST' : 'POST' };
+    const titles = { home: 'posts', about: 'about', links: 'links', guestbook: 'guestbook', post: data ? data.title || 'post' : 'post' };
     const depth = navStack.depth();
-    contentTitle.textContent = `┤ ${titles[view] || view.toUpperCase()}${depth > 1 ? ' [' + depth + ']' : ''} ├`;
+    contentTitle.textContent = `// ${(titles[view] || view).toLowerCase()}${depth > 1 ? ' [' + depth + ']' : ''}`;
 
     if (view === 'post' && data) {
       postSystem.render(data);
@@ -1497,6 +1497,43 @@ music.update();
     vim.showMsg('Guestbook entry added!');
   });
 })();
+
+// =============================================
+// PAGE GUTTER (rune.build style line numbers)
+// =============================================
+const GUTTER_LINE = 24;
+const gutterEl = document.getElementById('page-gutter');
+let gutterLines = [];
+
+function fillGutter() {
+  if (!gutterEl) return;
+  const count = Math.max(1, Math.floor(gutterEl.clientHeight / GUTTER_LINE));
+  if (gutterLines.length !== count) {
+    gutterEl.innerHTML = '';
+    gutterLines = [];
+    for (let i = 1; i <= count; i++) {
+      const span = document.createElement('span');
+      span.textContent = i;
+      gutterEl.appendChild(span);
+      gutterLines.push(span);
+    }
+  }
+  highlightGutter();
+}
+
+function highlightGutter() {
+  if (!gutterLines.length) return;
+  const idx = Math.min(gutterLines.length - 1, Math.max(0, Math.round(contentBody.scrollTop / GUTTER_LINE)));
+  gutterLines.forEach((el, i) => el.classList.toggle('gutter-hl', i === idx));
+}
+
+contentBody.addEventListener('scroll', highlightGutter, { passive: true });
+let gutterResizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(gutterResizeTimer);
+  gutterResizeTimer = setTimeout(fillGutter, 120);
+});
+fillGutter();
 
 // Load posts
 postSystem.load();

@@ -3,8 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>[ ASTAROTH ] - TUI Blog</title>
+  <title>ASTAROTH — TUI Blog</title>
+  <meta name="theme-color" content="#BA0E2E">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/modern-normalize@3.0.1/modern-normalize.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
   <link rel="stylesheet" href="style.css">
@@ -71,7 +75,8 @@ if(navigator.userAgent.includes('Zen/')){
 
     <!-- Top bar -->
     <div class="tui-topbar">
-      <span class="tui-topbar-left">[ ASTAROTH ]</span>
+      <span class="traffic" aria-hidden="true"><span class="r"></span><span class="y"></span><span class="g"></span></span>
+      <span class="tui-topbar-left">astaroth</span>
       <div class="tui-tabs">
         <span class="tui-tab active" data-tab="home">F1:Home</span>
         <span class="tui-tab" data-tab="about">F2:About</span>
@@ -84,9 +89,11 @@ if(navigator.userAgent.includes('Zen/')){
     <!-- Main area -->
     <div class="tui-main">
 
+      <div class="page-gutter" id="page-gutter" aria-hidden="true"></div>
+
       <!-- Left panel -->
       <div class="tui-panel tui-panel-left" id="panel-left">
-        <div class="tui-panel-title">┤ PROFILE ├</div>
+        <div class="tui-panel-title">// profile</div>
         <div class="tui-panel-body">
           <div class="profile-section">
             <pre class="profile-avatar">
@@ -138,7 +145,7 @@ if(navigator.userAgent.includes('Zen/')){
 
       <!-- Content panel -->
       <div class="tui-panel tui-panel-content" id="panel-content">
-        <div class="tui-panel-title" id="content-title">┤ POSTS ├</div>
+        <div class="tui-panel-title" id="content-title">// posts</div>
         <div class="tui-panel-body tui-scrollable" id="content-body">
 
           <!-- Tab: home (post list) -->
@@ -212,7 +219,7 @@ if(navigator.userAgent.includes('Zen/')){
 
       <!-- Right panel -->
       <div class="tui-panel tui-panel-right" id="panel-right">
-        <div class="tui-panel-title">┤ SHOUTBOX ├</div>
+        <div class="tui-panel-title">// shoutbox</div>
         <div class="tui-panel-body">
           <div class="shout-messages" id="shout-messages"></div>
 
